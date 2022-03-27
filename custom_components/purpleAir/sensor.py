@@ -11,6 +11,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
+import datetime
+import requests
 
 def setup_platform(
 	hass: HomeAssistant,
@@ -38,4 +40,10 @@ class PurpleAirSensor(SensorEntity):
 		self._attr_native_value = self.readSensor()
 		
 	def readSensor(self) -> int:
-		return 42
+		response  = requests.get("http://pa.willdarnell.net/json") # TODO: Pull from config
+		json      = response.json()
+		prefix    = "pm2_5_atm"
+		readings  = [json[prefix], json[prefix + "_b"]]
+		sensorAvg = round(sum(readings) / len(readings),1)
+		return sensorAvg
+	

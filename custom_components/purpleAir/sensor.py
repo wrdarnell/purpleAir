@@ -52,7 +52,6 @@ def setup_platform(
 		entities.append(PurpleAirSensor(url, VALUE_TYPES[value]))
 	add_entities(entities)
 
-
 class PurpleAirSensor(SensorEntity):
 	"""Representation of a Sensor."""
 	

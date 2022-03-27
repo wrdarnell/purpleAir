@@ -17,11 +17,21 @@ import requests
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 
+class PurpleAirMonitoredValue():
+	def __init__(self, prefix, name, unit, devClass):
+		self.prefix   = prefix
+		self.name     = name
+		self.unit     = unit
+		self.devClass = devClass
+
 CONFIG_URL    = "url"
 CONFIG_VALUES = "monitored_values"
 VALUE_TYPES = {
-	'pm2_5_atm',
+	'pm2_5_atm':  PurpleAirMonitoredValue("pm2_5_atm" , "PM 2.5", CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, SensorDeviceClass.PM25),
+	'pm10_0_atm': PurpleAirMonitoredValue("pm10_0_atm", "PM 10" , CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, SensorDeviceClass.PM10),
 }
+
+
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Required(CONFIG_URL): cv.string,
@@ -39,21 +49,20 @@ def setup_platform(
 	url = config[CONFIG_URL]
 	entities = []
 	for value in config[CONFIG_VALUES]:
-		entities.append(PurpleAirSensor(url, value))
+		entities.append(PurpleAirSensor(url, VALUE_TYPES[value]))
 	add_entities(entities)
 
 
 class PurpleAirSensor(SensorEntity):
 	"""Representation of a Sensor."""
-
-	_attr_name = "PM 2.5"
-	_attr_native_unit_of_measurement = CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
-	_attr_device_class = SensorDeviceClass.PM25
-	_attr_state_class = SensorStateClass.MEASUREMENT
 	
-	def __init__(self, url, value) -> None:
-		self._url   = url
-		self._value = value
+	def __init__(self, url, valueConfig) -> None:
+		self._url                             = url
+		self._prefix                          = valueConfig.prefix
+		self._attr_name                       = valueConfig.name
+		self._attr_native_unit_of_measurement = valueConfig.unit
+		self._attr_device_class               = valueConfig.devClass
+		self._attr_state_class                = SensorStateClass.MEASUREMENT
 
 	def update(self) -> None:
 		"""Fetch new state data for the sensor.
@@ -65,8 +74,11 @@ class PurpleAirSensor(SensorEntity):
 	def readSensor(self) -> int:
 		response  = requests.get(self._url)
 		json      = response.json()
-		prefix    = self._value
+		prefix    = self._prefix
 		readings  = [json[prefix], json[prefix + "_b"]]
 		sensorAvg = round(sum(readings) / len(readings),1)
 		return sensorAvg
-	
+		
+	@property
+	def unique_id(self):
+		return self._prefix

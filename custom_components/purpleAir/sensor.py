@@ -18,20 +18,20 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 
 class PurpleAirMonitoredValue():
-	def __init__(self, prefix, name, unit, devClass):
-		self.prefix   = prefix
-		self.name     = name
-		self.unit     = unit
-		self.devClass = devClass
+	def __init__(self, prefix, name, unit, decimalPlaces, devClass):
+		self.prefix        = prefix
+		self.name          = name
+		self.unit          = unit
+		self.decimalPlaces = decimalPlaces
+		self.devClass      = devClass
 
 CONFIG_URL    = "url"
 CONFIG_VALUES = "monitored_values"
 VALUE_TYPES = {
-	'pm2_5_atm':  PurpleAirMonitoredValue("pm2_5_atm" , "PM 2.5", CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, SensorDeviceClass.PM25),
-	'pm10_0_atm': PurpleAirMonitoredValue("pm10_0_atm", "PM 10" , CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, SensorDeviceClass.PM10),
+	'pm2_5_atm':  PurpleAirMonitoredValue("pm2_5_atm" , "PM 2.5"           , CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, 1, SensorDeviceClass.PM25),
+	'pm10_0_atm': PurpleAirMonitoredValue("pm10_0_atm", "PM 10"            , CONCENTRATION_MICROGRAMS_PER_CUBIC_METER, 1, SensorDeviceClass.PM10),
+	'pm2.5_aqi':  PurpleAirMonitoredValue("pm2.5_aqi" , "Air Quality Index", ""                                      , 0, SensorDeviceClass.AQI),	
 }
-
-
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Required(CONFIG_URL): cv.string,
@@ -62,6 +62,7 @@ class PurpleAirSensor(SensorEntity):
 		self._attr_name                       = valueConfig.name
 		self._attr_native_unit_of_measurement = valueConfig.unit
 		self._attr_device_class               = valueConfig.devClass
+		self._decimalPlaces                   = valueConfig.decimalPlaces
 		self._attr_state_class                = SensorStateClass.MEASUREMENT
 
 	def update(self) -> None:
@@ -69,14 +70,18 @@ class PurpleAirSensor(SensorEntity):
 
 		This is the only method that should fetch new data for Home Assistant.
 		"""
-		self._attr_native_value = self.readSensor()
+		value = self.readSensor()
+		if self._decimalPlaces == 0:
+			self._attr_native_value = int(value)
+		else:
+			self._attr_native_value = value
 		
-	def readSensor(self) -> int:
+	def readSensor(self) -> float:
 		response  = requests.get(self._url)
 		json      = response.json()
 		prefix    = self._prefix
 		readings  = [json[prefix], json[prefix + "_b"]]
-		sensorAvg = round(sum(readings) / len(readings),1)
+		sensorAvg = round(sum(readings) / len(readings), self._decimalPlaces)
 		return sensorAvg
 		
 	@property

@@ -10,9 +10,16 @@ from homeassistant.const import CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.components.sensor import (PLATFORM_SCHEMA)
 
 import datetime
 import requests
+import voluptuous as vol
+import homeassistant.helpers.config_validation as cv
+
+PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
+	vol.Required("url"): cv.string,
+})
 
 def setup_platform(
 	hass: HomeAssistant,
@@ -21,7 +28,7 @@ def setup_platform(
 	discovery_info: DiscoveryInfoType | None = None
 ) -> None:
 	"""Set up the sensor platform."""
-	add_entities([PurpleAirSensor()])
+	add_entities([PurpleAirSensor(config)])
 
 
 class PurpleAirSensor(SensorEntity):
@@ -31,6 +38,9 @@ class PurpleAirSensor(SensorEntity):
 	_attr_native_unit_of_measurement = CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
 	_attr_device_class = SensorDeviceClass.PM25
 	_attr_state_class = SensorStateClass.MEASUREMENT
+	
+	def __init__(self, config) -> None:
+		self._url = config["url"]
 
 	def update(self) -> None:
 		"""Fetch new state data for the sensor.
@@ -40,7 +50,7 @@ class PurpleAirSensor(SensorEntity):
 		self._attr_native_value = self.readSensor()
 		
 	def readSensor(self) -> int:
-		response  = requests.get("http://pa.willdarnell.net/json") # TODO: Pull from config
+		response  = requests.get(self._url)
 		json      = response.json()
 		prefix    = "pm2_5_atm"
 		readings  = [json[prefix], json[prefix + "_b"]]

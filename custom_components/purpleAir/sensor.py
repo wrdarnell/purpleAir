@@ -16,6 +16,7 @@ import datetime
 import requests
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
+import purpleAirData
 
 class PurpleAirMonitoredValue():
 	def __init__(self, prefix, name, unit, decimalPlaces, devClass):

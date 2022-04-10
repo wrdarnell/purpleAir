@@ -6,7 +6,7 @@ from homeassistant.components.sensor import (
 	SensorEntity,
 	SensorStateClass,
 )
-from homeassistant.const import CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
+
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -27,9 +27,11 @@ class PurpleAirMonitoredValue():
 
 CONFIG_URL    = "url"
 CONFIG_VALUES = "monitored_values"
+CONFIG_FREQ   = "update_frequency"
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Required(CONFIG_URL): cv.string,
+	vol.Required(CONFIG_FREQ): int,
 	vol.Required(CONFIG_VALUES):
 		vol.All(cv.ensure_list, vol.Length(min=1), [vol.In(purpleAirData.conditions)])
 })
@@ -43,7 +45,7 @@ def setup_platform(
 	"""Set up the sensor platform."""
 	url = config[CONFIG_URL]
 	entities = []
-	paData = purpleAirData(url, 30, config[CONFIG_VALUES])
+	paData = purpleAirData(url, config[CONFIG_FREQ], config[CONFIG_VALUES])
 	for value in config[CONFIG_VALUES]:
 		entities.append(PurpleAirEntity(url, value, paData))
 	add_entities(entities)

@@ -1,5 +1,7 @@
 import sched, time
 import requests
+from datetime import datetime
+from threading import Lock
 
 class conditionInfo():
 	"""Helper class containing info about the monitored condition"""
@@ -18,13 +20,25 @@ class conditionInfo():
 class purpleAirData():
 	"""Class that pulls data from the PurpleAir sensor and updates values for monitored conditions"""
 	def __init__(self, url, freq, conditions):
-		self._url    = url  # URL of the PA sensor (http://foo.bar/json)
-		self._freq   = freq # Frequency to update
-		self._values = {}   # Dict of values for the current reading
+		self._url        = url  # URL of the PA sensor (http://foo.bar/json)
+		self._freq       = freq # Frequency to update
+		self._values     = {}   # Dict of values for the current reading
+		self._lastUpdate = -1
 
 		# Init the list of values for the conditions we monitor
 		for condition in conditions:
 			self._values[condition] = 0.0 # Assume 0. May want to investigate defaults based on type or condition.
+
+	@property
+	def measurement(self):
+		lock = Lock()
+		with lock:
+			now = datetime.timestamp(datetime.now())
+			if (now > self._lastUpdate + self._freq):
+				print("Update needed. Next update at " + str(now + self._lastUpdate))
+				self._lastUpdate = now
+				self.refreshData()
+		return self._values
 
 	def refreshData(self):
 		"""Get data from the PA sensor and update monitored conditions"""

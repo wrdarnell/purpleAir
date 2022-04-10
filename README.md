@@ -27,3 +27,4 @@ The above configuration will make requests to a PurpleAir sensor at `<MyPurpleAi
 * Could use the async treatment
 * The health metric needs work. Still trying to find a calculation that will track the health percentage displayed on the PA website. Would be nice to trigger an alert if the sensor channels disagree too much
 * Not all values returned in the JSON object from the sensor are available.
+* This integration communicates with a Purple Air sensor directly over HTTP. A future version may allow for use of the PA API to read values from an arbitrary sensor

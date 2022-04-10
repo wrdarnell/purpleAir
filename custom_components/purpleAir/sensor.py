@@ -31,7 +31,7 @@ CONFIG_VALUES = "monitored_values"
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 	vol.Required(CONFIG_URL): cv.string,
 	vol.Required(CONFIG_VALUES):
-		vol.All(cv.ensure_list, vol.Length(min=1))#, [vol.In(VALUE_TYPES)]) TODO: Validate
+		vol.All(cv.ensure_list, vol.Length(min=1), [vol.In(purpleAirData.conditions)])
 })
 
 def setup_platform(

@@ -30,17 +30,16 @@ class purpleAirData():
 			self._values[condition] = 0.0 # Assume 0. May want to investigate defaults based on type or condition.
 
 	@property
-	def measurement(self):
+	def readings(self):
 		lock = Lock()
 		with lock:
 			now = datetime.timestamp(datetime.now())
 			if (now > self._lastUpdate + self._freq):
-				print("Update needed. Next update at " + str(now + self._lastUpdate))
 				self._lastUpdate = now
-				self.refreshData()
+				self.__refreshData()
 		return self._values
 
-	def refreshData(self):
+	def __refreshData(self):
 		"""Get data from the PA sensor and update monitored conditions"""
 		response  = requests.get(self._url)	# Read the sensor
 		json      = response.json()         # Parse the JSON
@@ -49,41 +48,41 @@ class purpleAirData():
 		for condition in self.conditions:
 			self._values[condition] = self.conditions[condition].func(self, json, condition)
 		
-	def sensorAvg(self, json, condition) -> float:
+	def __sensorAvg(self, json, condition) -> float:
 		"""Sets a value based on the average of the A and B sensor. Assumes 'foo' and 'foo_b' in json"""
 		info      = self.conditions[condition]
-		readings  = self.pairedReadings(json, condition) # Get the A and B values
+		readings  = self.__pairedReadings(json, condition) # Get the A and B values
 		return round(sum(readings) / len(readings), info.decimalPlaces) # Compute the average and round
 	
-	def singleValue(self, json, condition):
+	def __singleValue(self, json, condition):
 		"""Sets a value based on a single key in the json object"""
 		return json[condition]
 	
-	def pairedReadings(self, json, condition):
+	def __pairedReadings(self, json, condition):
 		"""Returns a list with the A and B values for a condition (e.g., 'foo' and 'foo_b')"""
 		prefix = condition
 		return [json[prefix], json[prefix + '_b']]
 	
-	def health(self, json, condition) -> float:
+	def __health(self, json, condition) -> float:
 		"""Computes and sets a synthetic health percentage by comparing A and B particle counters"""
 		# TODO: Find a better algorithm
-		readings = self.pairedReadings(json, 'pm2_5_atm')
+		readings = self.__pairedReadings(json, 'pm2_5_atm')
 		return readings[0] / readings[1]
 
 	### Master list of conditions that this implementation can monitor with helper object for how to process the metric
 	conditions = { 
-			  'pm2_5_atm'         : conditionInfo(func=sensorAvg,   decimalPlaces=1)
-			, 'pm10_0_atm'        : conditionInfo(func=sensorAvg,   decimalPlaces=1)
-			, 'pm2.5_aqi'         : conditionInfo(func=sensorAvg,   decimalPlaces=0)
-			, 'health'            : conditionInfo(func=health                      )
-			, 'ssid'              : conditionInfo(func=singleValue                 )
-			, 'SensorId'          : conditionInfo(func=singleValue                 )
-			, 'lat'               : conditionInfo(func=singleValue                 )
-			, 'lon'               : conditionInfo(func=singleValue                 )
-			, 'place'             : conditionInfo(func=singleValue                 )
-			, 'current_temp_f'    : conditionInfo(func=singleValue                 )
-			, 'current_humidity'  : conditionInfo(func=singleValue                 )
-			, 'current_dewpoint_f': conditionInfo(func=singleValue                 )
-			, 'pressure'          : conditionInfo(func=singleValue, decimalPlaces=2)
-			, 'DateTime'          : conditionInfo(func=singleValue                 )
+			  'pm2_5_atm'         : conditionInfo(func=__sensorAvg,   decimalPlaces=1)
+			, 'pm10_0_atm'        : conditionInfo(func=__sensorAvg,   decimalPlaces=1)
+			, 'pm2.5_aqi'         : conditionInfo(func=__sensorAvg,   decimalPlaces=0)
+			, 'health'            : conditionInfo(func=__health                      )
+			, 'ssid'              : conditionInfo(func=__singleValue                 )
+			, 'SensorId'          : conditionInfo(func=__singleValue                 )
+			, 'lat'               : conditionInfo(func=__singleValue                 )
+			, 'lon'               : conditionInfo(func=__singleValue                 )
+			, 'place'             : conditionInfo(func=__singleValue                 )
+			, 'current_temp_f'    : conditionInfo(func=__singleValue                 )
+			, 'current_humidity'  : conditionInfo(func=__singleValue                 )
+			, 'current_dewpoint_f': conditionInfo(func=__singleValue                 )
+			, 'pressure'          : conditionInfo(func=__singleValue, decimalPlaces=2)
+			, 'DateTime'          : conditionInfo(func=__singleValue                 )
 		}

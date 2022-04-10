@@ -6,8 +6,9 @@ def main():
 	for condition in purpleAirData.conditions:
 		conditions.append(condition)
 	pad = purpleAirData("http://pa.willdarnell.net/json", 30, conditions)
+
 	while (1==1):
-		print(pad.measurement['pm2_5_atm'])
+		print(pad.readings)
 		time.sleep(2)
 	
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ Purple Air sensor integration for Home Assistant. A work in progress.
 This integration creates one sensor entity per monitored condition. As necessary, the integration will make an HTTP GET request to a PurpleAir sensor on your local LAN. The result will be decoded and the sensor values updated.
 
 ## Install
-1. Clone or copy files to your Home Assistant environment
+1. Clone or copy files to your Home Assistant environment. Ultimately you should have the `custom_components/` folder alongside your `configuration.yaml`
 2. Edit your `configuration.yaml`
 3. Restart Home Assistant
 
@@ -26,6 +26,7 @@ The above configuration will make requests to a PurpleAir sensor at `<MyPurpleAi
 * I am new to Home Assistant and Python. There may be better / more idiomatic ways to do accomplish my goals
 * Can only interact with a single Purple Air sensor. A future update may allow for multiple sensors
 * Could use the async treatment
+* Could use finer control of when HA updates sensor values. I think this is happening at a default interval of 30s
 * The health metric needs work. Still trying to find a calculation that will track the health percentage displayed on the PA website. Would be nice to trigger an alert if the sensor channels disagree too much
 * Not all values returned in the JSON object from the sensor are available.
 * This integration communicates with a Purple Air sensor directly over HTTP. A future version may allow for use of the PA API to read values from an arbitrary sensor

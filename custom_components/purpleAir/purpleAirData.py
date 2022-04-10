@@ -87,18 +87,18 @@ class purpleAirData():
 
 	### Master list of conditions that this implementation can monitor with helper object for how to process the metric
 	conditions = { 
-			  'pm2_5_atm'         : conditionInfo(name='PM 2.5',              unit='µg/m³', func=__sensorAvg,   deviceClass=SensorDeviceClass.PM25,        decimalPlaces=1)
-			, 'pm10_0_atm'        : conditionInfo(name='PM 10',               unit='µg/m³', func=__sensorAvg,   deviceClass=SensorDeviceClass.PM10,        decimalPlaces=1)
-			, 'pm2.5_aqi'         : conditionInfo(name='Air Quality Index',   unit='',      func=__sensorAvg,   deviceClass=SensorDeviceClass.AQI,         decimalPlaces=0)
-			, 'health'            : conditionInfo(name='Sensor Health',       unit='',      func=__health                                                                 )
-			, 'ssid'              : conditionInfo(name='WiFi SSID',           unit='',      func=__singleValue                                                            )
-			, 'SensorId'          : conditionInfo(name='Sensor ID',           unit='',      func=__singleValue                                                            )
-			, 'lat'               : conditionInfo(name='Latitude',            unit='°',     func=__singleValue                                                            )
-			, 'lon'               : conditionInfo(name='Longitude',           unit='°',     func=__singleValue                                                            )
-			, 'place'             : conditionInfo(name='Place',               unit='',      func=__singleValue                                                            )
-			, 'current_temp_f'    : conditionInfo(name='Temperature',         unit='°F',    func=__singleValue, deviceClass=SensorDeviceClass.TEMPERATURE, decimalPlaces=1)
-			, 'current_humidity'  : conditionInfo(name='Humidity',            unit='%',     func=__singleValue, deviceClass=SensorDeviceClass.HUMIDITY,    decimalPlaces=0)
-			, 'current_dewpoint_f': conditionInfo(name='Dewpoint',            unit='°F',    func=__singleValue, deviceClass=SensorDeviceClass.TEMPERATURE, decimalPlaces=0)
-			, 'pressure'          : conditionInfo(name='Barometric Pressure', unit='mbar',  func=__singleValue, deviceClass=SensorDeviceClass.PRESSURE,    decimalPlaces=2)
-			, 'DateTime'          : conditionInfo(name='Timestamp',           unit='',      func=__singleValue                                                            )
-		}
+		  'pm2_5_atm'         : conditionInfo(name='PM 2.5',              unit='µg/m³', func=__sensorAvg,   deviceClass=SensorDeviceClass.PM25,        decimalPlaces=1)
+		, 'pm10_0_atm'        : conditionInfo(name='PM 10',               unit='µg/m³', func=__sensorAvg,   deviceClass=SensorDeviceClass.PM10,        decimalPlaces=1)
+		, 'pm2.5_aqi'         : conditionInfo(name='Air Quality Index',   unit='',      func=__sensorAvg,   deviceClass=SensorDeviceClass.AQI,         decimalPlaces=0)
+		, 'health'            : conditionInfo(name='Sensor Health',       unit='',      func=__health                                                                 )
+		, 'ssid'              : conditionInfo(name='WiFi SSID',           unit='',      func=__singleValue                                                            )
+		, 'SensorId'          : conditionInfo(name='Sensor ID',           unit='',      func=__singleValue                                                            )
+		, 'lat'               : conditionInfo(name='Latitude',            unit='°',     func=__singleValue                                                            )
+		, 'lon'               : conditionInfo(name='Longitude',           unit='°',     func=__singleValue                                                            )
+		, 'place'             : conditionInfo(name='Place',               unit='',      func=__singleValue                                                            )
+		, 'current_temp_f'    : conditionInfo(name='Temperature',         unit='°F',    func=__singleValue, deviceClass=SensorDeviceClass.TEMPERATURE, decimalPlaces=1)
+		, 'current_humidity'  : conditionInfo(name='Humidity',            unit='%',     func=__singleValue, deviceClass=SensorDeviceClass.HUMIDITY,    decimalPlaces=0)
+		, 'current_dewpoint_f': conditionInfo(name='Dewpoint',            unit='°F',    func=__singleValue, deviceClass=SensorDeviceClass.TEMPERATURE, decimalPlaces=0)
+		, 'pressure'          : conditionInfo(name='Barometric Pressure', unit='mbar',  func=__singleValue, deviceClass=SensorDeviceClass.PRESSURE,    decimalPlaces=2)
+		, 'DateTime'          : conditionInfo(name='Timestamp',           unit='',      func=__singleValue                                                            )
+	}

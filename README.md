@@ -23,6 +23,7 @@ sensor:
 The above configuration will make requests to a PurpleAir sensor at `<MyPurpleAirSensor>`. It will poll the sensor at most once every 60 seconds. It will create two sensor entities in Home Assistant, one for PM2.5 and one for PM10. For a list of supported conditions, see [purpleAirData.py](https://github.com/wrdarnell/purpleAir/blob/master/custom_components/purpleAir/purpleAirData.py).
 
 ## Limitations / To Do
+* I am new to Home Assistant and Python. There may be better / more idiomatic ways to do accomplish my goals
 * Can only interact with a single Purple Air sensor. A future update may allow for multiple sensors
 * Could use the async treatment
 * The health metric needs work. Still trying to find a calculation that will track the health percentage displayed on the PA website. Would be nice to trigger an alert if the sensor channels disagree too much

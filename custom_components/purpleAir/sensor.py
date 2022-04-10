@@ -13,10 +13,9 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.components.sensor import (PLATFORM_SCHEMA)
 
 import datetime
-import requests
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
-import purpleAirData
+from .purpleAirData import purpleAirData
 
 class PurpleAirMonitoredValue():
 	def __init__(self, prefix, name, unit, decimalPlaces, devClass):
@@ -49,14 +48,15 @@ def setup_platform(
 	"""Set up the sensor platform."""
 	url = config[CONFIG_URL]
 	entities = []
+	paData = purpleAirData(url, 30, config[CONFIG_VALUES])
 	for value in config[CONFIG_VALUES]:
-		entities.append(PurpleAirSensor(url, VALUE_TYPES[value]))
+		entities.append(PurpleAirEntity(url, VALUE_TYPES[value], paData))
 	add_entities(entities)
 
-class PurpleAirSensor(SensorEntity):
+class PurpleAirEntity(SensorEntity):
 	"""Representation of a Sensor."""
 	
-	def __init__(self, url, valueConfig) -> None:
+	def __init__(self, url, valueConfig, paData) -> None:
 		self._url                             = url
 		self._prefix                          = valueConfig.prefix
 		self._attr_name                       = valueConfig.name
@@ -64,25 +64,18 @@ class PurpleAirSensor(SensorEntity):
 		self._attr_device_class               = valueConfig.devClass
 		self._decimalPlaces                   = valueConfig.decimalPlaces
 		self._attr_state_class                = SensorStateClass.MEASUREMENT
+		self._paData                          = paData
 
 	def update(self) -> None:
 		"""Fetch new state data for the sensor.
 
 		This is the only method that should fetch new data for Home Assistant.
 		"""
-		value = self.readSensor()
+		value = self._paData.readings[self._prefix]
 		if self._decimalPlaces == 0:
 			self._attr_native_value = int(value)
 		else:
 			self._attr_native_value = value
-		
-	def readSensor(self) -> float:
-		response  = requests.get(self._url)
-		json      = response.json()
-		prefix    = self._prefix
-		readings  = [json[prefix], json[prefix + "_b"]]
-		sensorAvg = round(sum(readings) / len(readings), self._decimalPlaces)
-		return sensorAvg
 		
 	@property
 	def unique_id(self):
